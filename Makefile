@@ -140,6 +140,7 @@ release-src:
 
 	#DOCKER_BUILDKIT=0 docker build --no-cache -t apisix-dashboard:${TAG} . --build-arg ENABLE_PROXY=true
 
+# export DASHBOARD_TITLE="Ted Mule" && make quick
 quick: 
 	CGO_ENABLED=0 api/build.sh && \
 	cd ./web && \
