@@ -79,6 +79,7 @@ type ListInput struct {
 	ServerAddr string `auto_read:"server_addr,query"`
 	ServerPort int    `auto_read:"server_port,query"`
 	SNI        string `auto_read:"sni,query"`
+	Desc       string `auto_read:"desc,query"`
 	store.Pagination
 }
 
@@ -99,6 +100,9 @@ func (h *Handler) List(c droplet.Context) (interface{}, error) {
 			}
 
 			if input.SNI != "" && !strings.Contains(obj.(*entity.StreamRoute).SNI, input.SNI) {
+				return false
+			}
+			if input.Desc != "" && !strings.Contains(obj.(*entity.StreamRoute).Desc, input.Desc) {
 				return false
 			}
 
