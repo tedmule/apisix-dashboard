@@ -71,3 +71,5 @@ web/public/monaco-editor/
 
 # .env
 .env*
+
+build4images.sh
