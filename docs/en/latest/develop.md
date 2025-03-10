@@ -78,6 +78,7 @@ echo "SERVE_URL_DEV=http://localhost:9000" > web/.env
 If you don't want to create the file, you can also export the variable.
 
 ```bash
+export NODE_OPTIONS=--openssl-legacy-provider
 export SERVE_URL_DEV=http://localhost:9000
 ```
 
