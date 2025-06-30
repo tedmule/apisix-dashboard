@@ -26,7 +26,7 @@ VER ?= $(shell git describe --tags --dirty --always)
 ifeq ($(VER),)
 	VER = latest
 endif
-TAG = "stream-$(VER)"
+TAG = "$(VER)"
 
 RELEASE_SRC = apache-apisix-dashboard-${VERSION}-src
 

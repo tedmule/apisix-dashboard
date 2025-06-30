@@ -20,14 +20,15 @@ import React from 'react';
 
 export default () => (
   <DefaultFooter
-    copyright={`${new Date().getFullYear()} Apache APISIX(${process.env.DASHBOARD_VERSION ??= "dev"})`}
+    // copyright={`${new Date().getFullYear()} Apache APISIX(${process.env.DASHBOARD_VERSION ??= "dev"})`}
+    copyright={`${process.env.FOOTER_INFO ??= "Apache APISIX"}(${process.env.DASHBOARD_VERSION ??= "dev"})`}
     links={[
-      {
-        key: 'GitHub',
-        title: <GithubOutlined />,
-        href: 'https://github.com/apache/apisix',
-        blankTarget: true,
-      },
+      // {
+      //   key: 'GitHub',
+      //   title: <GithubOutlined />,
+      //   href: 'https://github.com/apache/apisix',
+      //   blankTarget: true,
+      // },
     ]}
   />
 );
