@@ -23,9 +23,9 @@ import { history, useLocation } from 'umi';
 
 export default function usePagination() {
   const location = useLocation();
-  const [paginationConfig, setPaginationConfig] = useState({ pageSize: 10, current: 1 });
+  const [paginationConfig, setPaginationConfig] = useState({ pageSize: 100, current: 1 });
   useEffect(() => {
-    const { page = 1, pageSize = 10 } = querystring.parse(location.search);
+    const { page = 1, pageSize = 100 } = querystring.parse(location.search);
     setPaginationConfig({ pageSize: Number(pageSize), current: Number(page) });
   }, [location.search]);
 
