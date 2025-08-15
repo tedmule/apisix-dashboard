@@ -19,6 +19,9 @@ declare namespace SSLModule {
     sni: string[];
     cert: string;
     key: string;
+    enablemTLS?: boolean;
+    mtls?: string;
+    client?: any;
   };
 
   type UploadPublicSuccessData = {
@@ -30,6 +33,11 @@ declare namespace SSLModule {
     key: string;
     privateKeyList: UploadFile[];
   };
+
+  type UploadCaSuccessData = {
+    ca: string;
+    caList: UploadFile[];
+  }
 
   type VerifyKeyPaireProps = {
     code: string;
@@ -54,5 +62,6 @@ declare namespace SSLModule {
     update_time: number;
     validity_start?: number;
     validity_end?: number;
+    client?: object;
   };
 }

@@ -33,18 +33,22 @@ const Page: React.FC = (props) => {
   const { formatMessage } = useIntl();
 
   const onValidateForm = () => {
+    console.log('------ raw form: ', form.getFieldsValue(true));
     let keyPaire = { cert: '', key: '' };
     form
       .validateFields()
       .then((value) => {
+        console.log('onValidateForm value: ', value);
         keyPaire = { cert: value.cert, key: value.key };
         return verifyKeyPaire(value.cert, value.key);
       })
       .then(({ data }) => {
+        console.log('onValidateForm form data: ', form.getFieldsValue(true));
         form.setFieldsValue({
-          ...form.getFieldsValue(),
+          ...form.getFieldsValue(true),
           ...keyPaire,
           snis: data.snis,
+          // mtls: data.mtls,
           expireTime: moment.unix(Number(data.validity_end)).format('YYYY-MM-DD HH:mm:ss'),
         });
         setStep(2);
@@ -56,11 +60,29 @@ const Page: React.FC = (props) => {
   const submit = () => {
     setSubmitLoading(true);
     const data = form.getFieldsValue();
-    const sslData = {
-      sni: data.snis,
+    console.log('------------------submitted form data: ');
+    console.log(JSON.stringify(data, null, 4));
+
+    let sslData = {
       cert: data.cert!,
       key: data.key!,
-    };
+    }
+    if (data.enablemTLS) {
+      sslData = {
+        ...sslData,
+        client: {
+          ca: data.ca,
+          depth: 2
+        },
+        snis: [data.mtls]
+      }
+    } else {
+      sslData = {
+        ...sslData,
+        snis: data.snis,
+      }
+    }
+
     (id ? update(id, sslData) : create(sslData))
       .then(() => {
         history.replace('/ssl/list');
@@ -89,11 +111,10 @@ const Page: React.FC = (props) => {
   return (
     <>
       <PageHeaderWrapper
-        title={`${
-          (props as any).match.params.id
-            ? formatMessage({ id: 'component.global.edit' })
-            : formatMessage({ id: 'component.global.create' })
-        }${formatMessage({ id: 'menu.ssl' })}`}
+        title={`${(props as any).match.params.id
+          ? formatMessage({ id: 'component.global.edit' })
+          : formatMessage({ id: 'component.global.create' })
+          }${formatMessage({ id: 'menu.ssl' })}`}
       >
         <Card bordered={false}>
           <Steps current={step - 1} className={styles.steps}>

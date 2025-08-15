@@ -23,6 +23,7 @@ import { useIntl } from 'umi';
 import CertificateForm from '@/pages/SSL/components/CertificateForm';
 import type { UploadType } from '@/pages/SSL/components/CertificateUploader';
 import CertificateUploader from '@/pages/SSL/components/CertificateUploader';
+import { SSLModule } from '../../typing'
 
 type CreateType = 'Upload' | 'Input';
 
@@ -31,10 +32,12 @@ type Props = {
 };
 
 const Step: React.FC<Props> = ({ form }) => {
+  console.log('Step1 form values: ', form.getFieldsValue());
+
   const [publicKeyList, setPublicKeyList] = useState<UploadFile[]>([]);
   const [privateKeyList, setPrivateKeyList] = useState<UploadFile[]>([]);
-
-  const [createType, setCreateType] = useState<CreateType>('Input');
+  const [caCertList, setCaCertList] = useState<UploadFile[]>([]);
+  const [createType, setCreateType] = useState<CreateType>('Upload');
 
   const { formatMessage } = useIntl();
 
@@ -46,35 +49,53 @@ const Step: React.FC<Props> = ({ form }) => {
         expireTime: undefined,
       });
       setPublicKeyList([]);
-    } else {
+    } else if (type === 'PRIVATE_KEY') {
       form.setFieldsValue({ key: '' });
       setPrivateKeyList([]);
+    } else {
+      form.setFieldsValue({ ca: '' })
+      setCaCertList([]);
     }
   };
 
   const handleSuccess = ({
     cert,
     key,
+    ca,
     ...rest
-  }: Partial<SSLModule.UploadPrivateSuccessData & SSLModule.UploadPublicSuccessData>) => {
+  }: Partial<SSLModule.UploadPrivateSuccessData & SSLModule.UploadPublicSuccessData & SSLModule.UploadCaSuccessData>) => {
+    console.log('------rest')
+    console.log(rest);
     if (cert) {
       setPublicKeyList(rest.publicKeyList!);
       form.setFieldsValue({ cert });
-    } else {
+    } else if (key) {
       form.setFieldsValue({ key });
       setPrivateKeyList(rest.privateKeyList!);
+    } else {
+      setCaCertList(rest.caList!)
+      form.setFieldsValue({ ca })
     }
+
+    // // Handle mtls and enablemTLS
+    // if (mtls !== undefined) {
+    //   form.setFieldsValue({ mtls });
+    // }
+    // if (enablemTLS !== undefined) {
+    //   form.setFieldsValue({ enablemTLS });
+    // }
   };
   return (
     <>
       <Form.Item label={formatMessage({ id: 'page.ssl.form.itemLabel.way' })} required>
         <Select
           placeholder={formatMessage({ id: 'page.ssl.select.placeholder.selectCreateWays' })}
-          defaultValue="Input"
+          defaultValue="Upload"
           onChange={(value: CreateType) => {
             form.setFieldsValue({
               key: '',
               cert: '',
+              ca: '',
               sni: '',
               expireTime: undefined,
             });
@@ -95,7 +116,7 @@ const Step: React.FC<Props> = ({ form }) => {
         <CertificateUploader
           onSuccess={handleSuccess}
           onRemove={onRemove}
-          data={{ publicKeyList, privateKeyList }}
+          data={{ publicKeyList, privateKeyList, caCertList }}
         />
       )}
     </>

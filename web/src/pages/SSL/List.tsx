@@ -45,6 +45,19 @@ const Page: React.FC = () => {
       },
     },
     {
+      title: 'mTLS',
+      dataIndex: 'client',
+      hideInSearch: true,
+      render: (_, record) => {
+        return (
+          <Tag color={record.client ? 'green' : 'red'} key={`mtls-${record.id}`}>
+            {record.client ? formatMessage({ id: 'component.global.enable' }) : formatMessage({ id: 'component.global.disable' })}
+          </Tag>
+        );
+      }
+
+    },
+    {
       title: formatMessage({ id: 'page.ssl.list.expirationTime' }),
       dataIndex: 'validity_end',
       hideInSearch: true,

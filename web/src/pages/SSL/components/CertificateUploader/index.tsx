@@ -15,30 +15,39 @@
  * limitations under the License.
  */
 import { UploadOutlined } from '@ant-design/icons';
-import { Button, Form, Upload } from 'antd';
+import { Button, Form, Upload, Switch, Input } from 'antd';
 import type { UploadFile } from 'antd/lib/upload/interface';
 import React from 'react';
 import { useIntl } from 'umi';
+import { useState } from 'react';
+import { SSLModule } from '../../typing'
 
 import styles from '@/pages/SSL/style.less';
 
-export type UploadType = 'PUBLIC_KEY' | 'PRIVATE_KEY';
+export type UploadType = 'PUBLIC_KEY' | 'PRIVATE_KEY' | 'CA_CERTIFICATE';
 
 type UploaderProps = {
   data: {
     publicKeyList: UploadFile[];
     privateKeyList: UploadFile[];
+    caCertList: UploadFile[];
+    enmTLS?: boolean;
+    mtls?: string;
   };
   onSuccess: (
-    data: Partial<SSLModule.UploadPrivateSuccessData & SSLModule.UploadPublicSuccessData>,
+    data: Partial<SSLModule.UploadPrivateSuccessData & SSLModule.UploadPublicSuccessData & SSLModule.UploadCaSuccessData>,
+    enablemTLS?: boolean,
+    mtls?: string
   ) => void;
   onRemove: (type: UploadType) => void;
 };
 
 const CertificateUploader: React.FC<UploaderProps> = ({ onSuccess, onRemove, data }) => {
-  const { publicKeyList = [], privateKeyList = [] } = data;
+  const { publicKeyList = [], privateKeyList = [], caCertList = [], mtls = '', enmTLS = false } = data;
   const [form] = Form.useForm();
   const { formatMessage } = useIntl();
+  const [enablemTLS, setEnablemTLS] = useState<boolean>(false);
+
 
   const genUploadFile = (name = ''): UploadFile => {
     return {
@@ -62,12 +71,18 @@ const CertificateUploader: React.FC<UploaderProps> = ({ onSuccess, onRemove, dat
           publicKeyList: [genUploadFile(fileName)],
         };
         onSuccess(uploadPublicData);
-      } else {
+      } else if (type === 'PRIVATE_KEY') {
         const uploadprivateData: SSLModule.UploadPrivateSuccessData = {
           key: result,
           privateKeyList: [genUploadFile(fileName)],
         };
         onSuccess(uploadprivateData);
+      } else {
+        const uploadcaData: SSLModule.UploadCaSuccessData = {
+          ca: result,
+          caList: [genUploadFile(fileName)],
+        };
+        onSuccess(uploadcaData);
       }
     };
   };
@@ -79,7 +94,7 @@ const CertificateUploader: React.FC<UploaderProps> = ({ onSuccess, onRemove, dat
 
   return (
     <Form form={form} layout="horizontal" className={styles.stepForm}>
-      <Form.Item>
+      <Form.Item >
         <Upload
           className={styles.stepForm}
           onRemove={() => onRemove('PUBLIC_KEY')}
@@ -106,6 +121,53 @@ const CertificateUploader: React.FC<UploaderProps> = ({ onSuccess, onRemove, dat
           </Button>
         </Upload>
       </Form.Item>
+
+      <Form.Item
+        label="启用mTLS"
+        name="enablemTLS"
+      >
+        <Switch
+          checked={enablemTLS}
+          onChange={(checked) => setEnablemTLS(checked)}
+        />
+      </Form.Item>
+
+      {enablemTLS && (
+        <>
+          <Form.Item
+            label="mTLS"
+            name="mtls"
+            rules={[
+              {
+                required: true,
+                message: "请输入需要启用mTLS的域名",
+              },
+            ]}
+          >
+            <Input
+              placeholder="输入需要启用mTLS的域名"
+              onChange={(e) => {
+                console.log('mtls changed:', e.target.value);
+                form.setFieldsValue({ mtls: e.target.value });
+              }}
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Upload
+              className={styles.stepForm}
+              onRemove={() => onRemove('CA_CERTIFICATE')}
+              fileList={caCertList}
+              beforeUpload={(file, fileList) => beforeUpload(file, fileList, 'CA_CERTIFICATE')}
+              maxCount={1}
+            >
+              <Button disabled={caCertList.length === 1}>
+                <UploadOutlined /> 上传CA证书
+              </Button>
+            </Upload>
+          </Form.Item>
+        </>
+      )}
     </Form>
   );
 };

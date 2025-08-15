@@ -20,6 +20,8 @@ export default {
   'page.ssl.form.itemRuleMessage.certValueLength': '证书内容至少需要128个字符',
   'page.ssl.form.itemLabel.privateKey': '私钥',
   'page.ssl.form.itemRuleMessage.privateKeyLength': '私钥 至少需要128个字符',
+  'page.ssl.form.itemLabel.caCert': 'CA证书',
+  'page.ssl.form.itemRuleMessage.caCertLength': '私钥 至少需要128个字符',
 
   'page.ssl.button.uploadCert': '上传证书',
 
@@ -41,4 +43,5 @@ export default {
     '证书被网关用于处理加密请求，它将与 SNI 关联，并与路由中主机名绑定。',
   'component.ssl.fields.cert.required': '请输入证书内容',
   'component.ssl.fields.key.required': '请输入私钥内容',
+  'component.ssl.fields.ca.required': '请输入CA证书内容',
 };

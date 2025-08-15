@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Form, Input, Tag } from 'antd';
+import { Form, Input, Tag, Switch } from 'antd';
 import type { FormInstance } from 'antd/lib/form';
-import React from 'react';
+import React, { useState } from 'react';
 import { useIntl } from 'umi';
 
 type CertificateFormProps = {
@@ -26,6 +26,14 @@ type CertificateFormProps = {
 
 const CertificateForm: React.FC<CertificateFormProps> = ({ mode, form }) => {
   const { formatMessage } = useIntl();
+  const [enablemTLS, setEnablemTLS] = useState<boolean>(form.getFieldValue('enablemTLS') || false);
+  // if (mode === 'VIEW') {
+  //   setEnablemTLS(form.getFieldValue('enablemTLS') || false);
+  // }
+
+  console.log('CertificateForm mode: ', mode, 'enablemTLS:', enablemTLS);
+  console.log('CertificateForm form values: ', form.getFieldsValue());
+
   const renderSNI = () => {
     if (mode === 'VIEW') {
       return (
@@ -103,6 +111,57 @@ const CertificateForm: React.FC<CertificateFormProps> = ({ mode, form }) => {
           placeholder={formatMessage({ id: 'component.ssl.fields.key.required' })}
         />
       </Form.Item>
+
+      <Form.Item label="启用mTLS" name="enablemTLS">
+        <Switch
+          checked={enablemTLS}
+          onChange={(checked) => setEnablemTLS(checked)}
+        />
+      </Form.Item>
+      {enablemTLS && (
+        <>
+          <Form.Item
+            label="mTLS"
+            name="mtls"
+            rules={[
+              {
+                required: enablemTLS,
+                message: "请输入需要启用mTLS的域名",
+              },
+            ]}
+          >
+            <Input
+              name="mtls"
+              placeholder="输入需要启用mTLS的域名"
+            // onChange={(e) => form.setFieldsValue({ mtls: e.target.value })}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label={formatMessage({ id: 'page.ssl.form.itemLabel.caCert' })}
+            name="ca"
+            rules={[
+              {
+                required: enablemTLS,
+                message: `${formatMessage({ id: 'component.global.pleaseCheck' })}${formatMessage({
+                  id: 'page.ssl.form.itemLabel.caCert',
+                })}`,
+              },
+              {
+                min: 128,
+                message: formatMessage({ id: 'page.ssl.form.itemRuleMessage.caCertLength' }),
+              },
+            ]}
+          >
+            <Input.TextArea
+              rows={6}
+              disabled={mode !== 'EDIT'}
+              placeholder={formatMessage({ id: 'component.ssl.fields.ca.required' })}
+            />
+          </Form.Item>
+
+        </>
+      )}
       {renderExpireTime()}
     </Form>
   );
