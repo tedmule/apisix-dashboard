@@ -141,32 +141,34 @@ type ListInput struct {
 // produces:
 // - application/json
 // parameters:
-// - name: page
-//   in: query
-//   description: page number
-//   required: false
-//   type: integer
-// - name: page_size
-//   in: query
-//   description: page size
-//   required: false
-//   type: integer
-// - name: sni
-//   in: query
-//   description: sni of SSL
-//   required: false
-//   type: string
+//   - name: page
+//     in: query
+//     description: page number
+//     required: false
+//     type: integer
+//   - name: page_size
+//     in: query
+//     description: page size
+//     required: false
+//     type: integer
+//   - name: sni
+//     in: query
+//     description: sni of SSL
+//     required: false
+//     type: string
+//
 // responses:
-//   '0':
-//     description: list response
-//     schema:
-//       type: array
-//       items:
-//         "$ref": "#/definitions/ssl"
-//   default:
-//     description: unexpected error
-//     schema:
-//       "$ref": "#/definitions/ApiError"
+//
+//	'0':
+//	  description: list response
+//	  schema:
+//	    type: array
+//	    items:
+//	      "$ref": "#/definitions/ssl"
+//	default:
+//	  description: unexpected error
+//	  schema:
+//	    "$ref": "#/definitions/ApiError"
 func (h *Handler) List(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*ListInput)
 
@@ -226,6 +228,14 @@ func (h *Handler) Create(c droplet.Context) (interface{}, error) {
 	ssl.Labels = input.Labels
 	//set default value for SSL status, if not set, it will be 0 which means disable.
 	ssl.Status = conf.SSLDefaultStatus
+
+	if input.Client.CA != "" {
+		ssl.Client = &entity.SSLClient{
+			CA:    input.Client.CA,
+			Depth: input.Client.Depth,
+		}
+		ssl.Snis = input.Snis
+	}
 	ret, err := h.sslStore.Create(c.Context(), ssl)
 	if err != nil {
 		return handler.SpecCodeResponse(err), err
@@ -430,25 +440,27 @@ func ParseCert(crt, key string) (*entity.SSL, error) {
 // produces:
 // - application/json
 // parameters:
-// - name: cert
-//   in: body
-//   description: cert of SSL
-//   required: true
-//   type: string
-// - name: key
-//   in: body
-//   description: key of SSL
-//   required: true
-//   type: string
+//   - name: cert
+//     in: body
+//     description: cert of SSL
+//     required: true
+//     type: string
+//   - name: key
+//     in: body
+//     description: key of SSL
+//     required: true
+//     type: string
+//
 // responses:
-//   '0':
-//     description: SSL verify passed
-//     schema:
-//       "$ref": "#/definitions/ApiError"
-//   default:
-//     description: unexpected error
-//     schema:
-//       "$ref": "#/definitions/ApiError"
+//
+//	'0':
+//	  description: SSL verify passed
+//	  schema:
+//	    "$ref": "#/definitions/ApiError"
+//	default:
+//	  description: unexpected error
+//	  schema:
+//	    "$ref": "#/definitions/ApiError"
 func (h *Handler) Validate(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*entity.SSL)
 	ssl, err := ParseCert(input.Cert, input.Key)
@@ -491,22 +503,24 @@ type ExistCheckInput struct {
 // produces:
 // - application/json
 // parameters:
-// - name: hosts
-//   in: body
-//   description: hosts of Route
-//   required: true
-//   type: array
+//   - name: hosts
+//     in: body
+//     description: hosts of Route
+//     required: true
+//     type: array
 //     items:
 //     type: string
+//
 // responses:
-//   '0':
-//     description: SSL exists
-//     schema:
-//       "$ref": "#/definitions/ApiError"
-//   default:
-//     description: unexpected error
-//     schema:
-//       "$ref": "#/definitions/ApiError"
+//
+//	'0':
+//	  description: SSL exists
+//	  schema:
+//	    "$ref": "#/definitions/ApiError"
+//	default:
+//	  description: unexpected error
+//	  schema:
+//	    "$ref": "#/definitions/ApiError"
 func (h *Handler) Exist(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*ExistCheckInput)
 	if len(input.Hosts) == 0 {
