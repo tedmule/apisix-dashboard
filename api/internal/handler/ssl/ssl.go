@@ -229,7 +229,7 @@ func (h *Handler) Create(c droplet.Context) (interface{}, error) {
 	//set default value for SSL status, if not set, it will be 0 which means disable.
 	ssl.Status = conf.SSLDefaultStatus
 
-	if input.Client.CA != "" {
+	if input.Client != nil && input.Client.CA != "" {
 		ssl.Client = &entity.SSLClient{
 			CA:    input.Client.CA,
 			Depth: input.Client.Depth,
