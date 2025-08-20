@@ -33,17 +33,14 @@ const Page: React.FC = (props) => {
   const { formatMessage } = useIntl();
 
   const onValidateForm = () => {
-    console.log('------ raw form: ', form.getFieldsValue(true));
     let keyPaire = { cert: '', key: '' };
     form
       .validateFields()
       .then((value) => {
-        console.log('onValidateForm value: ', value);
         keyPaire = { cert: value.cert, key: value.key };
         return verifyKeyPaire(value.cert, value.key);
       })
       .then(({ data }) => {
-        console.log('onValidateForm form data: ', form.getFieldsValue(true));
         form.setFieldsValue({
           ...form.getFieldsValue(true),
           ...keyPaire,
@@ -58,10 +55,9 @@ const Page: React.FC = (props) => {
   const [submitLoading, setSubmitLoading] = useState(false);
 
   const submit = () => {
+    console.log('------------------submit');
     setSubmitLoading(true);
     const data = form.getFieldsValue();
-    console.log('------------------submitted form data: ');
-    console.log(JSON.stringify(data, null, 4));
 
     let sslData = {
       cert: data.cert!,

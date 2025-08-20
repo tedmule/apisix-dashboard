@@ -32,8 +32,6 @@ type Props = {
 };
 
 const Step: React.FC<Props> = ({ form }) => {
-  console.log('Step1 form values: ', form.getFieldsValue());
-
   const [publicKeyList, setPublicKeyList] = useState<UploadFile[]>([]);
   const [privateKeyList, setPrivateKeyList] = useState<UploadFile[]>([]);
   const [caCertList, setCaCertList] = useState<UploadFile[]>([]);
@@ -53,7 +51,7 @@ const Step: React.FC<Props> = ({ form }) => {
       form.setFieldsValue({ key: '' });
       setPrivateKeyList([]);
     } else {
-      form.setFieldsValue({ ca: '' })
+      form.setFieldsValue({ ca: '' });
       setCaCertList([]);
     }
   };
@@ -64,8 +62,6 @@ const Step: React.FC<Props> = ({ form }) => {
     ca,
     ...rest
   }: Partial<SSLModule.UploadPrivateSuccessData & SSLModule.UploadPublicSuccessData & SSLModule.UploadCaSuccessData>) => {
-    console.log('------rest')
-    console.log(rest);
     if (cert) {
       setPublicKeyList(rest.publicKeyList!);
       form.setFieldsValue({ cert });
@@ -75,15 +71,10 @@ const Step: React.FC<Props> = ({ form }) => {
     } else {
       setCaCertList(rest.caList!)
       form.setFieldsValue({ ca })
+      // Pass enablemTLS and mtls to form
+      form.setFieldsValue({ enablemTLS: rest.enablemTLS || false });
+      form.setFieldsValue({ mtls: rest.mtls || '' });
     }
-
-    // // Handle mtls and enablemTLS
-    // if (mtls !== undefined) {
-    //   form.setFieldsValue({ mtls });
-    // }
-    // if (enablemTLS !== undefined) {
-    //   form.setFieldsValue({ enablemTLS });
-    // }
   };
   return (
     <>

@@ -37,6 +37,8 @@ declare namespace SSLModule {
   type UploadCaSuccessData = {
     ca: string;
     caList: UploadFile[];
+    enablemTLS?: boolean;
+    mtls?: string;
   }
 
   type VerifyKeyPaireProps = {

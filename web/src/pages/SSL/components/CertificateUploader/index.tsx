@@ -31,22 +31,23 @@ type UploaderProps = {
     publicKeyList: UploadFile[];
     privateKeyList: UploadFile[];
     caCertList: UploadFile[];
-    enmTLS?: boolean;
+    enablemTLS?: boolean;
     mtls?: string;
   };
   onSuccess: (
-    data: Partial<SSLModule.UploadPrivateSuccessData & SSLModule.UploadPublicSuccessData & SSLModule.UploadCaSuccessData>,
-    enablemTLS?: boolean,
-    mtls?: string
+    data: Partial<SSLModule.UploadPrivateSuccessData & SSLModule.UploadPublicSuccessData & SSLModule.UploadCaSuccessData & boolean & string>,
+    // enablemTLS?: boolean,
+    // mtls?: string
   ) => void;
   onRemove: (type: UploadType) => void;
 };
 
 const CertificateUploader: React.FC<UploaderProps> = ({ onSuccess, onRemove, data }) => {
-  const { publicKeyList = [], privateKeyList = [], caCertList = [], mtls = '', enmTLS = false } = data;
+  const { publicKeyList = [], privateKeyList = [], caCertList = [] } = data;
   const [form] = Form.useForm();
   const { formatMessage } = useIntl();
-  const [enablemTLS, setEnablemTLS] = useState<boolean>(false);
+  const [enablemTLS, setEnablemTLS] = useState<boolean>(data.enablemTLS || false);
+  const [mtls, setMtls] = useState<string>(data.mtls || "");
 
 
   const genUploadFile = (name = ''): UploadFile => {
@@ -81,6 +82,8 @@ const CertificateUploader: React.FC<UploaderProps> = ({ onSuccess, onRemove, dat
         const uploadcaData: SSLModule.UploadCaSuccessData = {
           ca: result,
           caList: [genUploadFile(fileName)],
+          enablemTLS: form.getFieldValue('enablemTLS') || false,
+          mtls: form.getFieldValue('mtls') || '',
         };
         onSuccess(uploadcaData);
       }
@@ -147,8 +150,7 @@ const CertificateUploader: React.FC<UploaderProps> = ({ onSuccess, onRemove, dat
             <Input
               placeholder="输入需要启用mTLS的域名"
               onChange={(e) => {
-                console.log('mtls changed:', e.target.value);
-                form.setFieldsValue({ mtls: e.target.value });
+                setMtls(e.target.value)
               }}
             />
           </Form.Item>

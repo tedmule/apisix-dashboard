@@ -27,12 +27,6 @@ type CertificateFormProps = {
 const CertificateForm: React.FC<CertificateFormProps> = ({ mode, form }) => {
   const { formatMessage } = useIntl();
   const [enablemTLS, setEnablemTLS] = useState<boolean>(form.getFieldValue('enablemTLS') || false);
-  // if (mode === 'VIEW') {
-  //   setEnablemTLS(form.getFieldValue('enablemTLS') || false);
-  // }
-
-  console.log('CertificateForm mode: ', mode, 'enablemTLS:', enablemTLS);
-  console.log('CertificateForm form values: ', form.getFieldsValue());
 
   const renderSNI = () => {
     if (mode === 'VIEW') {
