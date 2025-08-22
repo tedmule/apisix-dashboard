@@ -125,7 +125,7 @@ const CertificateUploader: React.FC<UploaderProps> = ({ onSuccess, onRemove, dat
         </Upload>
       </Form.Item>
 
-      <Form.Item
+      {/* <Form.Item
         label="启用mTLS"
         name="enablemTLS"
       >
@@ -169,7 +169,8 @@ const CertificateUploader: React.FC<UploaderProps> = ({ onSuccess, onRemove, dat
             </Upload>
           </Form.Item>
         </>
-      )}
+      )} */}
+
     </Form>
   );
 };

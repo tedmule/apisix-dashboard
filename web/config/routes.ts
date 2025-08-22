@@ -20,10 +20,10 @@ const routes = [
     // component: './Dashboard',
     component: './Route/List',
   },
-  {
-    path: '/dashboard',
-    component: './Dashboard',
-  },
+  // {
+  //   path: '/dashboard',
+  //   component: './Dashboard',
+  // },
   {
     path: '/serverinfo',
     component: './ServerInfo',

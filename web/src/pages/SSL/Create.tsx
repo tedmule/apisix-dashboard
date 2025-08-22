@@ -55,7 +55,6 @@ const Page: React.FC = (props) => {
   const [submitLoading, setSubmitLoading] = useState(false);
 
   const submit = () => {
-    console.log('------------------submit');
     setSubmitLoading(true);
     const data = form.getFieldsValue();
 
