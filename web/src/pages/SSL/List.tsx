@@ -45,6 +45,22 @@ const Page: React.FC = () => {
       },
     },
     {
+      title: formatMessage({ id: 'page.ssl.form.itemLabel.sslProtocols' }),
+      dataIndex: 'ssl_protocols',
+      hideInSearch: true,
+      render: (_, record) => {
+        const protocols = record.ssl_protocols || [];
+        if (protocols.length === 0) {
+          return '-';
+        }
+        return protocols.map((protocol) => (
+          <Tag color="geekblue" key={protocol}>
+            {protocol}
+          </Tag>
+        ));
+      },
+    },
+    {
       title: 'mTLS',
       dataIndex: 'client',
       hideInSearch: true,

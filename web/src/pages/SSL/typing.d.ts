@@ -61,6 +61,7 @@ declare namespace SSLModule {
     cert: string;
     create_time: number;
     snis: string[];
+    ssl_protocols?: string[];
     status: number;
     update_time: number;
     validity_start?: number;
