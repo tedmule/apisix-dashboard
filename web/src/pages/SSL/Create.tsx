@@ -41,10 +41,13 @@ const Page: React.FC = (props) => {
         return verifyKeyPaire(value.cert, value.key);
       })
       .then(({ data }) => {
+        // prefer manually entered snis (from the upload UI) when present
+        const manual = form.getFieldValue('manual_snis_values');
+        const currentSnis = Array.isArray(manual) && manual.length > 0 ? manual : form.getFieldValue('snis');
         form.setFieldsValue({
           ...form.getFieldsValue(true),
           ...keyPaire,
-          snis: data.snis,
+          snis: (Array.isArray(currentSnis) && currentSnis.length > 0) ? currentSnis : data.snis,
           // mtls: data.mtls,
           expireTime: moment.unix(Number(data.validity_end)).format('YYYY-MM-DD HH:mm:ss'),
         });
@@ -57,25 +60,41 @@ const Page: React.FC = (props) => {
   const submit = () => {
     setSubmitLoading(true);
     const data = form.getFieldsValue();
+    const sslProtocols = form.getFieldValue('ssl_protocols') || data.ssl_protocols;
 
-    let sslData = {
+    let sslData: any = {
       cert: data.cert!,
       key: data.key!,
+    };
+    if (Array.isArray(sslProtocols) && sslProtocols.length > 0) {
+      sslData.ssl_protocols = sslProtocols;
     }
+    // prefer manual snis if provided
+    const manual = form.getFieldValue('manual_snis_values');
+    const snisSource = Array.isArray(manual) && manual.length > 0 ? manual : data.snis;
+    const snisArr: string[] = Array.isArray(snisSource)
+      ? snisSource
+      : snisSource
+      ? String(snisSource)
+          .split(',')
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0)
+      : [];
+
     if (data.enablemTLS) {
       sslData = {
         ...sslData,
         client: {
           ca: data.ca,
-          depth: 2
+          depth: 2,
         },
-        snis: [data.mtls]
-      }
+        snis: [data.mtls],
+      };
     } else {
       sslData = {
         ...sslData,
-        snis: data.snis,
-      }
+        snis: snisArr,
+      };
     }
 
     (id ? update(id, sslData) : create(sslData))

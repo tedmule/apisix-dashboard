@@ -27,6 +27,8 @@ export default {
 
   'page.ssl.form.itemLabel.way': 'Way',
   'page.ssl.select.placeholder.selectCreateWays': 'Please select create ways',
+    'page.ssl.form.itemLabel.sni': 'SNI',
+    'page.ssl.form.itemPlaceholder.sni': 'Enter associated SNIs, comma separated',
   'page.ssl.selectOption.input': 'Input',
   'page.ssl.upload': 'Upload',
 

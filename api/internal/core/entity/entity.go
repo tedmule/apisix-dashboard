@@ -226,6 +226,7 @@ type SSL struct {
 	Key           string            `json:"key,omitempty"`
 	Sni           string            `json:"sni,omitempty"`
 	Snis          []string          `json:"snis,omitempty"`
+	SslProtocols  []string          `json:"ssl_protocols,omitempty"`
 	Certs         []string          `json:"certs,omitempty"`
 	Keys          []string          `json:"keys,omitempty"`
 	ExpTime       int64             `json:"exptime,omitempty"`

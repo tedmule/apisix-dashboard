@@ -22,6 +22,10 @@ export default {
   'page.ssl.form.itemRuleMessage.privateKeyLength': '私钥 至少需要128个字符',
   'page.ssl.form.itemLabel.caCert': 'CA证书',
   'page.ssl.form.itemRuleMessage.caCertLength': '私钥 至少需要128个字符',
+  'page.ssl.form.itemLabel.sslProtocols': 'TLS 版本',
+  'page.ssl.select.placeholder.sslProtocols': '请选择允许的 TLS 版本',
+  'page.ssl.form.itemLabel.sni': 'SNI',
+  'page.ssl.form.itemPlaceholder.sni': '输入要关联的 SNI，多个以逗号分隔',
 
   'page.ssl.button.uploadCert': '上传证书',
 

@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 import { UploadOutlined } from '@ant-design/icons';
-import { Button, Form, Upload, Switch, Input } from 'antd';
+import { Button, Form, Upload, Switch, Input, Select } from 'antd';
+import type { FormInstance } from 'antd/lib/form';
 import type { UploadFile } from 'antd/lib/upload/interface';
 import React from 'react';
 import { useIntl } from 'umi';
@@ -27,6 +28,7 @@ import styles from '@/pages/SSL/style.less';
 export type UploadType = 'PUBLIC_KEY' | 'PRIVATE_KEY' | 'CA_CERTIFICATE';
 
 type UploaderProps = {
+  form: FormInstance;
   data: {
     publicKeyList: UploadFile[];
     privateKeyList: UploadFile[];
@@ -36,18 +38,21 @@ type UploaderProps = {
   };
   onSuccess: (
     data: Partial<SSLModule.UploadPrivateSuccessData & SSLModule.UploadPublicSuccessData & SSLModule.UploadCaSuccessData & boolean & string>,
-    // enablemTLS?: boolean,
-    // mtls?: string
   ) => void;
   onRemove: (type: UploadType) => void;
 };
 
-const CertificateUploader: React.FC<UploaderProps> = ({ onSuccess, onRemove, data }) => {
+const protocolOptions = [
+  { label: 'TLSv1.1', value: 'TLSv1.1' },
+  { label: 'TLSv1.2', value: 'TLSv1.2' },
+  { label: 'TLSv1.3', value: 'TLSv1.3' },
+];
+
+const CertificateUploader: React.FC<UploaderProps> = ({ onSuccess, onRemove, data, form }) => {
   const { publicKeyList = [], privateKeyList = [], caCertList = [] } = data;
-  const [form] = Form.useForm();
   const { formatMessage } = useIntl();
-  const [enablemTLS, setEnablemTLS] = useState<boolean>(data.enablemTLS || false);
-  const [mtls, setMtls] = useState<string>(data.mtls || "");
+  const [enablemTLS, setEnablemTLS] = useState<boolean>(form.getFieldValue('enablemTLS') || false);
+  const [mtls, setMtls] = useState<string>(form.getFieldValue('mtls') || '');
 
 
   const genUploadFile = (name = ''): UploadFile => {
@@ -97,7 +102,7 @@ const CertificateUploader: React.FC<UploaderProps> = ({ onSuccess, onRemove, dat
 
   return (
     <Form form={form} layout="horizontal" className={styles.stepForm}>
-      <Form.Item >
+      <Form.Item>
         <Upload
           className={styles.stepForm}
           onRemove={() => onRemove('PUBLIC_KEY')}
@@ -125,6 +130,28 @@ const CertificateUploader: React.FC<UploaderProps> = ({ onSuccess, onRemove, dat
         </Upload>
       </Form.Item>
 
+      <Form.Item label={formatMessage({ id: 'page.ssl.form.itemLabel.sslProtocols' })} name="ssl_protocols">
+        <Select
+          mode="multiple"
+          allowClear
+          placeholder={formatMessage({ id: 'page.ssl.select.placeholder.sslProtocols' })}
+          options={protocolOptions}
+        />
+      </Form.Item>
+
+      <Form.Item label={formatMessage({ id: 'page.ssl.form.itemLabel.sni' })}>
+        <Input
+          placeholder={formatMessage({ id: 'page.ssl.form.itemPlaceholder.sni' })}
+          onChange={(e) => {
+            const raw = e.target.value || '';
+            const arr = raw
+              .split(',')
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0);
+            form.setFieldsValue({ snis: arr, manual_snis_values: arr.length > 0 ? arr : undefined });
+          }}
+        />
+      </Form.Item>
       {/* <Form.Item
         label="启用mTLS"
         name="enablemTLS"

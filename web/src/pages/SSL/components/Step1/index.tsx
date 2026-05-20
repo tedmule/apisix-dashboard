@@ -105,6 +105,7 @@ const Step: React.FC<Props> = ({ form }) => {
       </div>
       {Boolean(createType === 'Upload') && (
         <CertificateUploader
+          form={form}
           onSuccess={handleSuccess}
           onRemove={onRemove}
           data={{ publicKeyList, privateKeyList, caCertList }}

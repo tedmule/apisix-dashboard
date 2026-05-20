@@ -21,6 +21,7 @@ declare namespace SSLModule {
     key: string;
     enablemTLS?: boolean;
     mtls?: string;
+    ssl_protocols?: string[];
     client?: any;
   };
 

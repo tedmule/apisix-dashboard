@@ -153,9 +153,9 @@ const CertificateForm: React.FC<CertificateFormProps> = ({ mode, form }) => {
               placeholder={formatMessage({ id: 'component.ssl.fields.ca.required' })}
             />
           </Form.Item>
-
         </>
       )}
+
       {renderExpireTime()}
     </Form>
   );

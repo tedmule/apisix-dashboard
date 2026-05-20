@@ -228,13 +228,28 @@ func (h *Handler) Create(c droplet.Context) (interface{}, error) {
 	ssl.Labels = input.Labels
 	//set default value for SSL status, if not set, it will be 0 which means disable.
 	ssl.Status = conf.SSLDefaultStatus
-
+	// copy client and snis when provided
 	if input.Client != nil && input.Client.CA != "" {
 		ssl.Client = &entity.SSLClient{
 			CA:    input.Client.CA,
 			Depth: input.Client.Depth,
 		}
 		ssl.Snis = input.Snis
+	} else if input.Snis != nil && len(input.Snis) > 0 {
+		// prefer user provided snis over cert parsed values
+		// normalize: remove empty strings
+		filtered := make([]string, 0, len(input.Snis))
+		for _, s := range input.Snis {
+			if s = strings.TrimSpace(s); s != "" {
+				filtered = append(filtered, s)
+			}
+		}
+		ssl.Snis = filtered
+	}
+
+	// copy ssl protocols if provided
+	if input.SslProtocols != nil && len(input.SslProtocols) > 0 {
+		ssl.SslProtocols = input.SslProtocols
 	}
 	ret, err := h.sslStore.Create(c.Context(), ssl)
 	if err != nil {
@@ -276,6 +291,37 @@ func (h *Handler) Update(c droplet.Context) (interface{}, error) {
 
 	//set default value for SSL status, if not set, it will be 0 which means disable.
 	ssl.Status = conf.SSLDefaultStatus
+	// preserve client, snis and ssl_protocols from input if provided
+	if input.Client != nil && input.Client.CA != "" {
+		ssl.Client = &entity.SSLClient{
+			CA:    input.Client.CA,
+			Depth: input.Client.Depth,
+		}
+		ssl.Snis = input.Snis
+	} else if input.Snis != nil && len(input.Snis) > 0 {
+		filtered := make([]string, 0, len(input.Snis))
+		for _, s := range input.Snis {
+			if s = strings.TrimSpace(s); s != "" {
+				filtered = append(filtered, s)
+			}
+		}
+		ssl.Snis = filtered
+	}
+
+	if input.SslProtocols != nil && len(input.SslProtocols) > 0 {
+		ssl.SslProtocols = input.SslProtocols
+	}
+
+	// if user provided a single SNI (non-wildcard), set the singular Sni field
+	if ssl.Snis != nil && len(ssl.Snis) == 1 {
+		single := strings.TrimSpace(ssl.Snis[0])
+		if single != "" {
+			ssl.Sni = single
+		}
+	} else {
+		// clear singular Sni to avoid schema mismatch when multiple snis exist
+		ssl.Sni = ""
+	}
 	ret, err := h.sslStore.Update(c.Context(), ssl, true)
 	if err != nil {
 		return handler.SpecCodeResponse(err), err
