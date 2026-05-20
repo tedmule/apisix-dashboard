@@ -26,7 +26,7 @@ TARGET_IMAGE_NAME="harbor.hexinpass.com/apache/apisix-dashboard:${TAG}-2s-intern
 docker tag ${SOURCE_IMAGE_NAME}  ${TARGET_IMAGE_NAME}
 docker push ${TARGET_IMAGE_NAME}
 
-export DASHBOARD_TITLE=本地测试 && export FOOTER_INFO="明宇测试环境" && make quick
+export DASHBOARD_TITLE=明宇测试 && export FOOTER_INFO="明宇测试环境" && make quick
 SOURCE_IMAGE_NAME="apisix-dashboard:${TAG}"
 TARGET_IMAGE_NAME="harbor.hexinpass.com/apache/apisix-dashboard:${TAG}-my"
 docker tag ${SOURCE_IMAGE_NAME}  ${TARGET_IMAGE_NAME}
